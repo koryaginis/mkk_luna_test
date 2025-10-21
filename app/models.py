@@ -1,11 +1,18 @@
 from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy.dialects.postgresql import Ltree
+from ltree_models import LtreeMixin
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Table
 
 Base = declarative_base()
 
+# organizations_activities = Table(
+#     'organizations_activities',
+#     Column("organization_id", Integer, ForeignKey("organizations.id"), primary_key=True),
+#     Column("activity_id", Integer, ForeignKey("activities.id"), primary_key=True)
+# )
+
 organizations_activities = Table(
     'organizations_activities',
+    Base.metadata,
     Column("organization_id", Integer, ForeignKey("organizations.id"), primary_key=True),
     Column("activity_id", Integer, ForeignKey("activities.id"), primary_key=True)
 )
@@ -43,11 +50,10 @@ class Building(Base):
 
     organizations = relationship("Organization", back_populates="building")
 
-class Activity(Base):
+class Activity(Base, LtreeMixin):
     __tablename__ = "activities"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False) # Название вида деятельности
-    path = Column(Ltree, index=True, nullable=False)
 
     organizations = relationship('Organization', secondary=organizations_activities, back_populates="activities")
