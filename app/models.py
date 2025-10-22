@@ -4,12 +4,6 @@ from sqlalchemy import Column, Integer, String, Float, ForeignKey, Table
 
 Base = declarative_base()
 
-# organizations_activities = Table(
-#     'organizations_activities',
-#     Column("organization_id", Integer, ForeignKey("organizations.id"), primary_key=True),
-#     Column("activity_id", Integer, ForeignKey("activities.id"), primary_key=True)
-# )
-
 organizations_activities = Table(
     'organizations_activities',
     Base.metadata,
