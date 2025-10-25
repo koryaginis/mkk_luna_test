@@ -51,3 +51,8 @@ class Activity(Base, LtreeMixin):
     name = Column(String, nullable=False) # Название вида деятельности
 
     organizations = relationship('Organization', secondary=organizations_activities, back_populates="activities")
+
+class TestModel(Base):
+    __tablename__ = "test_model"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)

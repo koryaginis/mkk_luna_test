@@ -2,9 +2,7 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from app.deps import get_db, engine
-from alembic.config import Config
-from alembic import command
-import logging
+from app.routers import phones_router, organizations_router
 
 from contextlib import asynccontextmanager
 
@@ -16,12 +14,12 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS ltree;"))
 
-    alembic_config = Config("/code/alembic.ini")
-    command.upgrade(alembic_config, "head")
-
     yield
 
 app = FastAPI(lifespan=lifespan)
+
+app.include_router(phones_router.router, prefix="/api")
+app.include_router(organizations_router.router, prefix="/api") 
 
 @app.get("/")
 async def get_start_page():
