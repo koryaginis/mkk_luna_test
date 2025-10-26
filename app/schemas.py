@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, PositiveInt, ConfigDict, Field
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
@@ -26,13 +26,21 @@ class ActivitySchema(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-class OrganizationSchema(BaseModel):
-    id: PositiveInt = Field(description="Идентификатор организации")
-    name: str = Field(description="Название организации")
-    building_id: PositiveInt = Field(description="Идентификатор здания")
+"""Организации"""
 
-    phones: List[PhoneSchema] = Field(description="Телефоны организации")
-    building: BuildingSchema = Field(description="Здание организации")
-    activities: List[ActivitySchema] = Field(description="Виды деятельности организации")
+class OrganizationBaseSchema(BaseModel):
+    name: str = Field(description="Название организации")
+    building_id: Optional[PositiveInt] = Field(description="Идентификатор здания", default=None)
 
     model_config = ConfigDict(from_attributes=True)
+
+class OrganizationSchema(OrganizationBaseSchema):
+    id: PositiveInt = Field(description="Идентификатор организации")
+
+    phones: List[PhoneSchema] = Field(description="Телефоны организации", default_factory=list)
+    building: Optional[BuildingSchema] = Field(description="Здание организации", default=None)
+    activities: List[ActivitySchema] = Field(description="Виды деятельности организации", default_factory=list)
+
+class OrganizationUpdateSchema(BaseModel):
+    name: Optional[str] = Field(None, description="Название организации")
+    building_id: Optional[PositiveInt] = Field(None, description="Идентификатор здания")

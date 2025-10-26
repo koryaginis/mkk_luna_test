@@ -16,7 +16,7 @@ class Organization(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False) # Название организации
-    building_id = Column(Integer, ForeignKey("buildings.id"), nullable=False) # Идентификатор здания организации
+    building_id = Column(Integer, ForeignKey("buildings.id"), nullable=True) # Идентификатор здания организации
 
     phones = relationship("Phone", back_populates="organization", cascade="all, delete-orphan")
     building = relationship("Building", back_populates="organizations")
