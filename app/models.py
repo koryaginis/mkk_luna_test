@@ -27,7 +27,7 @@ class Phone(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     number = Column(String, nullable=False) # Номер телефона
-    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=False) # Идентификатор организации
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True) # Идентификатор организации
 
     organization = relationship("Organization", back_populates="phones")
 

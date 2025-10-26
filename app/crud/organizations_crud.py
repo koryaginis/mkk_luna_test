@@ -100,14 +100,6 @@ async def update_organization(
     Обновляет организацию по id.
     Если организация не найдена, возвращает 404.
     """
-    result = await db.execute(select(Building).where(Building.id == update_data.building_id))
-    building = result.scalar_one_or_none()
-    if building is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Building with id {update_data.building_id} does not exist."
-        )
-    
     result = await db.execute(select(Organization).where(Organization.id == organization_id))
     db_organization = result.scalar_one_or_none()
 
@@ -117,7 +109,16 @@ async def update_organization(
             detail=f"Organization with id {organization_id} not found."
         )
 
-    for field, value in update_data.dict(exclude_unset=True).items():
+    if update_data.building_id is not None:
+        result = await db.execute(select(Building).where(Building.id == update_data.building_id))
+        building = result.scalar_one_or_none()
+        if building is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Building with id {update_data.building_id} does not exist."
+            )
+
+    for field, value in update_data.model_dump(exclude_unset=True).items():
         setattr(db_organization, field, value)
 
     db.add(db_organization)

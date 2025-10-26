@@ -2,12 +2,22 @@ from typing import List, Optional
 from pydantic import BaseModel, PositiveInt, ConfigDict, Field
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
-class PhoneSchema(BaseModel):
-    id: PositiveInt = Field(description="Идентификатор телефона")
+"""Телефоны"""
+
+class PhoneBaseSchema(BaseModel):
     number: PhoneNumber = Field(description="Номер телефона")
-    organization_id: PositiveInt = Field(description="Идентификатор организации")
+    organization_id: Optional[PositiveInt] = Field(description="Идентификатор организации", default=None)
 
     model_config = ConfigDict(from_attributes=True)
+
+class PhoneSchema(PhoneBaseSchema):
+    id: PositiveInt = Field(description="Идентификатор телефона")
+
+class PhoneUpdateSchema(BaseModel):
+    number: Optional[PhoneNumber] = Field(None, description="Номер телефона")
+    organization_id: Optional[PositiveInt] = Field(None, description="Идентификатор организации")
+
+"""Здания"""
 
 class BuildingSchema(BaseModel):
     id: PositiveInt = Field(description="Идентификатор здания")
@@ -19,6 +29,8 @@ class BuildingSchema(BaseModel):
     longitude: float = Field(ge=-180, le=180, description="Долгота (-180..180)")
 
     model_config = ConfigDict(from_attributes=True)
+
+"""Деятельности"""
 
 class ActivitySchema(BaseModel):
     id: PositiveInt = Field(description="Идентификатор деятельности")
