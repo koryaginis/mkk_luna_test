@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from app.deps import get_db, engine
-from app.routers import phones_router, organizations_router
+from app.routers import phones_router, organizations_router, buildings_router
 
 from contextlib import asynccontextmanager
 
@@ -19,7 +19,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(phones_router.router, prefix="/api")
-app.include_router(organizations_router.router, prefix="/api") 
+app.include_router(organizations_router.router, prefix="/api")
+app.include_router(buildings_router.router, prefix="/api")
 
 @app.get("/")
 async def get_start_page():

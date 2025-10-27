@@ -19,8 +19,7 @@ class PhoneUpdateSchema(BaseModel):
 
 """Здания"""
 
-class BuildingSchema(BaseModel):
-    id: PositiveInt = Field(description="Идентификатор здания")
+class BuildingBaseSchema(BaseModel):
     country: str = Field(description="Страна")
     city: str = Field(description="Город")
     street: str = Field(description="Улица")
@@ -29,6 +28,17 @@ class BuildingSchema(BaseModel):
     longitude: float = Field(ge=-180, le=180, description="Долгота (-180..180)")
 
     model_config = ConfigDict(from_attributes=True)
+
+class BuildingSchema(BuildingBaseSchema):
+    id: PositiveInt = Field(description="Идентификатор здания")
+
+class BuildingUpdateSchema(BaseModel):
+    country: Optional[str] = Field(description="Страна", default=None)
+    city: Optional[str] = Field(description="Город", default=None)
+    street: Optional[str] = Field(description="Улица", default=None)
+    house_number: Optional[str] = Field(description="Номер дома", default=None)
+    latitude: Optional[float] = Field(ge=-90, le=90, description="Широта (-90..90)", default=None)
+    longitude: Optional[float] = Field(ge=-180, le=180, description="Долгота (-180..180)", default=None)
 
 """Деятельности"""
 
