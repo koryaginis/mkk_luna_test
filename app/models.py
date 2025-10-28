@@ -1,5 +1,4 @@
 from sqlalchemy.orm import declarative_base, relationship
-from ltree_models import LtreeMixin
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Table
 
 Base = declarative_base()
@@ -44,15 +43,11 @@ class Building(Base):
 
     organizations = relationship("Organization", back_populates="building")
 
-class Activity(Base, LtreeMixin):
+class Activity(Base):
     __tablename__ = "activities"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False) # Название вида деятельности
+    path = Column(String, nullable=False) # Ссылка на деятельность в древовидной структуре
 
     organizations = relationship('Organization', secondary=organizations_activities, back_populates="activities")
-
-class TestModel(Base):
-    __tablename__ = "test_model"
-    id = Column(Integer, primary_key=True)
-    name = Column(String)

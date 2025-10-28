@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import List, Optional
 from pydantic import BaseModel, PositiveInt, ConfigDict, Field
 from pydantic_extra_types.phone_numbers import PhoneNumber
@@ -42,11 +43,21 @@ class BuildingUpdateSchema(BaseModel):
 
 """Деятельности"""
 
-class ActivitySchema(BaseModel):
-    id: PositiveInt = Field(description="Идентификатор деятельности")
+class ActivityBaseSchema(BaseModel):
     name: str = Field(description="Название деятельности")
+    path: Optional[str] = Field(description="Путь для древовидной структуры", default=None)
 
     model_config = ConfigDict(from_attributes=True)
+
+# ActivityBaseSchema.model_rebuild()
+
+class ActivitySchema(ActivityBaseSchema):
+    id: PositiveInt = Field(description="Идентификатор деятельности")
+    children: List[ActivitySchema] = Field(default_factory=list)
+
+class ActivityUpdateSchema(BaseModel):
+    name: Optional[str] = Field(description="Название деятельности", default=None)
+    path: Optional[str] = Field(description="Путь для древовидной структуры", default=None)
 
 """Организации"""
 
