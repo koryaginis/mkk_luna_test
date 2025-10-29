@@ -45,7 +45,8 @@ class BuildingUpdateSchema(BaseModel):
 
 class ActivityBaseSchema(BaseModel):
     name: str = Field(description="Название деятельности")
-    path: Optional[str] = Field(description="Путь для древовидной структуры", default=None)
+    # path: Optional[str] = Field(description="Путь для древовидной структуры", default=None)
+    parent_id: Optional[PositiveInt] = Field(description="Идентификатор родительского элемента", default=None)
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -53,11 +54,13 @@ class ActivityBaseSchema(BaseModel):
 
 class ActivitySchema(ActivityBaseSchema):
     id: PositiveInt = Field(description="Идентификатор деятельности")
-    children: List[ActivitySchema] = Field(default_factory=list)
+
+class ActivityTreeSchema(ActivitySchema):
+    children: List[ActivityTreeSchema] = Field(default_factory=list)
 
 class ActivityUpdateSchema(BaseModel):
     name: Optional[str] = Field(description="Название деятельности", default=None)
-    path: Optional[str] = Field(description="Путь для древовидной структуры", default=None)
+    parent_id: Optional[PositiveInt] = Field(description="Идентификатор нового родительского элемента", default=None)
 
 """Организации"""
 

@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import List
 from app.settings import settings
-from app.schemas import ActivityBaseSchema, ActivitySchema
+from app.schemas import ActivityBaseSchema, ActivitySchema, ActivityTreeSchema
 from app.models import Activity
 import re
 import unidecode
@@ -67,7 +67,7 @@ async def build_activity_tree(activities: List[ActivitySchema], root_path: str) 
     path_to_node = {}
 
     for activity in activities:
-        node = ActivitySchema(
+        node = ActivityTreeSchema(
             id=activity.id,
             name=activity.name,
             path=activity.path,
@@ -87,6 +87,7 @@ async def build_activity_tree(activities: List[ActivitySchema], root_path: str) 
         raise ValueError(f"Root activity with path {root_path} not found")
     
     return activity_tree
+
 
 
 
