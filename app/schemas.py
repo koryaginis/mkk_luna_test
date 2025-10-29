@@ -45,12 +45,9 @@ class BuildingUpdateSchema(BaseModel):
 
 class ActivityBaseSchema(BaseModel):
     name: str = Field(description="Название деятельности")
-    # path: Optional[str] = Field(description="Путь для древовидной структуры", default=None)
     parent_id: Optional[PositiveInt] = Field(description="Идентификатор родительского элемента", default=None)
 
     model_config = ConfigDict(from_attributes=True)
-
-# ActivityBaseSchema.model_rebuild()
 
 class ActivitySchema(ActivityBaseSchema):
     id: PositiveInt = Field(description="Идентификатор деятельности")
@@ -80,3 +77,15 @@ class OrganizationSchema(OrganizationBaseSchema):
 class OrganizationUpdateSchema(BaseModel):
     name: Optional[str] = Field(None, description="Название организации")
     building_id: Optional[PositiveInt] = Field(None, description="Идентификатор здания")
+
+"""Схемы для связи деятельности и организации"""
+
+class ActOrgSchema(BaseModel):
+    organization_id: PositiveInt = Field(description="Идентификатор организации")
+    activity_id: PositiveInt = Field(description="Идентификатор вида деятельности")
+
+    model_config = ConfigDict(from_attributes=True)
+
+class ActOrgUpdateSchema(BaseModel):
+    organization_id: Optional[PositiveInt] = Field(description="Идентификатор организации", default=None)
+    activity_id: Optional[PositiveInt] = Field(description="Идентификатор вида деятельности", default=None)

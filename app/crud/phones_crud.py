@@ -10,8 +10,8 @@ async def create_phone(phone_data: PhoneBaseSchema, db: AsyncSession) -> PhoneSc
     """
     if phone_data.organization_id is not None:
         result = await db.execute(select(Organization).where(Organization.id == phone_data.organization_id))
-        building = result.scalar_one_or_none()
-        if building is None:
+        organization = result.scalar_one_or_none()
+        if organization is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Organization with id {phone_data.organization_id} does not exist."
