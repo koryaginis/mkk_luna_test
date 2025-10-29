@@ -6,4 +6,4 @@
 
 * API_KEY=123e4567-e89b-12d3-a456-426614174000
 
-* Swagger: [loc](http://localhost:8001/docs#/)
+* [Swagger](http://localhost:8001/docs#/)
