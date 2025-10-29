@@ -1,6 +1,4 @@
 from fastapi import FastAPI
-from sqlalchemy import text
-from app.deps import engine
 from app.routers import (
     phones_router, 
     organizations_router, 
@@ -8,19 +6,7 @@ from app.routers import (
     activities_router
 )
 
-from contextlib import asynccontextmanager
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """
-    Создает расширение ltree при инициализации приложения.
-    """
-    async with engine.begin() as conn:
-        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS ltree;"))
-
-    yield
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 app.include_router(phones_router.router, prefix="/api")
 app.include_router(organizations_router.router, prefix="/api")

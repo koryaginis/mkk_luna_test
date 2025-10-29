@@ -6,12 +6,13 @@ COPY ./requirements.txt /code/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
+COPY entrypoint.sh /entrypoint.sh
+
 COPY ./app /code/app
 
 # COPY ./migrations /app/migrations
 # COPY alembic.ini /code/alembic.ini
 
-COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
