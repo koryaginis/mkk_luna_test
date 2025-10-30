@@ -42,7 +42,8 @@ async def get_organization(organization_id: int, db: AsyncSession) -> Organizati
     select(Organization)
     .options(
         selectinload(Organization.phones),
-        selectinload(Organization.activities)
+        selectinload(Organization.activities),
+        selectinload(Organization.building)
     )
     .where(Organization.id == organization_id)
     )
@@ -64,7 +65,8 @@ async def get_organization_list(db: AsyncSession) -> list[OrganizationSchema]:
         select(Organization)
         .options(
             selectinload(Organization.phones),
-            selectinload(Organization.activities)
+            selectinload(Organization.activities),
+            selectinload(Organization.building)
         )
     )
 
