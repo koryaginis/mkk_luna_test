@@ -6,10 +6,10 @@ from ..schemas import OrganizationSchema
 from ..utils import verify_api_key
 from ..deps import get_db
 from ..crud.act_org_crud import get_organizations_by_act_id
-from ..logic.main_logic import get_organizations_by_building_id
 from ..crud.organizations_crud import (get_organization_by_id, 
                                        get_organization_by_name, 
-                                       get_organizations_in_rectangle)
+                                       get_organizations_in_rectangle,
+                                       get_organizations_by_building_id)
 
 router = APIRouter(
     prefix="/main_logic",
