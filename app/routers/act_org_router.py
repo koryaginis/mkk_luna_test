@@ -41,7 +41,7 @@ async def get_activities_by_org_id_endpoint(
     """
     return await get_activities_by_org_id(organization_id=organization_id, db=db)
 
-@router.get("/organizations/{activity_id}", response_model=List[OrganizationSchema], status_code=status.HTTP_200_OK)
+@router.get("/organizations/{activity_id}", response_model=List[str], status_code=status.HTTP_200_OK)
 async def get_organizations_by_act_id_endpoint(
     activity_id: PositiveInt,
     db: AsyncSession = Depends(get_db),

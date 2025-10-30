@@ -9,7 +9,7 @@ from ..models import Organization
 
 from ..crud.organizations_crud import (
     get_organization_list,
-    get_organization,
+    get_organization_by_id,
     create_organization,
     update_organization,
     delete_organization,
@@ -32,7 +32,7 @@ async def create_organization_endpoint(
     return await create_organization(organization_data=organization_data, db=db)
 
 @router.get("/{organization_id}", response_model=OrganizationSchema, status_code=status.HTTP_200_OK)
-async def get_organization_endpoint(
+async def get_organization_by_id_endpoint(
     organization_id: int,
     db: AsyncSession = Depends(get_db),
     _: None = Depends(verify_api_key),
@@ -40,7 +40,7 @@ async def get_organization_endpoint(
     """
     Эндпоинт для получения организации по id.
     """
-    return await get_organization(organization_id=organization_id, db=db)
+    return await get_organization_by_id(organization_id=organization_id, db=db)
 
 @router.get("/", response_model=List[OrganizationSchema], status_code=status.HTTP_200_OK)
 async def get_organization_list_endpoint(

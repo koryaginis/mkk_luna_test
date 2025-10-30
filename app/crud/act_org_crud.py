@@ -5,6 +5,7 @@ from pydantic import PositiveInt
 from typing import List
 from ..schemas import ActOrgSchema, ActivitySchema, OrganizationSchema
 from ..models import Organization, Activity, organizations_activities
+from ..utils import organizations_to_list
 
 async def create_act_org(data: ActOrgSchema, db: AsyncSession) -> ActOrgSchema:
     """
@@ -63,9 +64,10 @@ async def get_activities_by_org_id(organization_id: int, db: AsyncSession) -> Li
 
     return [ActivitySchema(id=activity.id, name=activity.name, parent_id=None) for activity in activities]
 
-async def get_organizations_by_act_id(activity_id: int, db: AsyncSession) -> List[OrganizationSchema]:
+async def get_organizations_by_act_id(activity_id: int, db: AsyncSession) -> List:
     """
-    Получает организации вида деятельности.
+    Получает организации по указанному виду деятельности.
+    Если указан родительский вид деятельности, возвращает организации всех дочерних активностей.
     """
     result = await db.execute(select(Activity).where(Activity.id == activity_id))
     activity = result.scalar_one_or_none()
@@ -74,11 +76,18 @@ async def get_organizations_by_act_id(activity_id: int, db: AsyncSession) -> Lis
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Activity with id {activity_id} does not exist."
         )
-    
+
+    pattern = f"{activity.path}%"
+    result = await db.execute(
+        select(Activity.id).where(Activity.path.like(pattern))
+    )
+    activity_ids = [row[0] for row in result.all()]
+
     result = await db.execute(
         select(Organization)
         .join(organizations_activities, Organization.id == organizations_activities.c.organization_id)
-        .where(organizations_activities.c.activity_id == activity_id)
+        .where(organizations_activities.c.activity_id.in_(activity_ids))
+        .distinct()
     )
     organizations = result.scalars().all()
 
@@ -87,8 +96,10 @@ async def get_organizations_by_act_id(activity_id: int, db: AsyncSession) -> Lis
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"No organizations found for activity id {activity_id}."
         )
+    
+    organizations_list = await organizations_to_list(organizations)
 
-    return [OrganizationSchema(id=organization.id, name=organization.name, parent_id=None) for organization in organizations]
+    return organizations_list
 
 async def get_act_org():
     ...

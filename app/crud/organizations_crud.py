@@ -1,9 +1,12 @@
 from fastapi import HTTPException, status
+from sqlalchemy import func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+from typing import List
 from app.models import Organization, Building
 from app.schemas import OrganizationBaseSchema, OrganizationSchema, OrganizationUpdateSchema
+from app.utils import organizations_to_list
 
 async def create_organization(organization_data: OrganizationBaseSchema, db: AsyncSession) -> OrganizationSchema:
     """
@@ -33,7 +36,7 @@ async def create_organization(organization_data: OrganizationBaseSchema, db: Asy
 
     return OrganizationSchema.model_validate(db_organization)
 
-async def get_organization(organization_id: int, db: AsyncSession) -> OrganizationSchema:
+async def get_organization_by_id(organization_id: int, db: AsyncSession) -> OrganizationSchema:
     """
     Получает организацию по ее id.
     Если организация не найдена, возвращает HTTP 404.
@@ -56,6 +59,70 @@ async def get_organization(organization_id: int, db: AsyncSession) -> Organizati
         )
 
     return OrganizationSchema.model_validate(db_organization)
+
+async def get_organization_by_name(organization_name: str, db: AsyncSession) -> OrganizationSchema:
+    """
+    Получает организацию по ее имени.
+    Если организация не найдена, возвращает HTTP 404.
+    """
+    result = await db.execute(
+    select(Organization)
+    .options(
+        selectinload(Organization.phones),
+        selectinload(Organization.activities),
+        selectinload(Organization.building)
+    )
+    .where(func.lower(Organization.name) == organization_name.lower())
+    )
+    db_organization = result.scalar_one_or_none()
+
+    if db_organization is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Organization with name {organization_name} not found."
+        )
+
+    return OrganizationSchema.model_validate(db_organization)
+
+async def get_organizations_in_rectangle(
+    lat_min: float,
+    lon_min: float,
+    lat_max: float,
+    lon_max: float,
+    db: AsyncSession
+) -> List[str]:
+    """
+    Получает список организаций, расположенных в прямоугольной области,
+    заданной двумя координатами (юго-запад и северо-восток).
+    """
+    result = await db.execute(
+        select(Organization)
+        .join(Organization.building)
+        .options(
+            selectinload(Organization.phones),
+            selectinload(Organization.activities),
+            selectinload(Organization.building)
+        )
+        .where(
+            and_(
+                Building.latitude >= lat_min,
+                Building.latitude <= lat_max,
+                Building.longitude >= lon_min,
+                Building.longitude <= lon_max
+            )
+        )
+    )
+    organizations = result.scalars().all()
+
+    if not organizations:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No organizations found in the specified area."
+        )
+    
+    organizations_list = await organizations_to_list(organizations)
+
+    return organizations_list
 
 async def get_organization_list(db: AsyncSession) -> list[OrganizationSchema]:
     """

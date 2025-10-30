@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import List
 from app.settings import settings
-from app.schemas import ActivityBaseSchema, ActivitySchema, ActivityTreeSchema
+from app.schemas import ActivityBaseSchema, ActivitySchema, ActivityTreeSchema, OrganizationSchema
 from app.models import Activity
 import re
 import unidecode
@@ -87,6 +87,13 @@ async def build_activity_tree(activities: List[ActivitySchema], root_path: str) 
         raise ValueError(f"Root activity with path {root_path} not found")
     
     return activity_tree
+
+async def organizations_to_list(organizations: List[OrganizationSchema]) -> List[dict]:
+    """
+    Преобразует список объектов OrganizationSchema в список с именами организаций.
+    """
+    orgs_list = [org.name for org in organizations]
+    return orgs_list
 
 
 
